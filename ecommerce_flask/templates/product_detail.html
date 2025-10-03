@@ -1,0 +1,104 @@
+{# MultipleFiles/product_detail.html #}
+
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - ShoeStore{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="admin-card">
+            <img src="{{ product.image_url or 'https://picsum.photos/seed/shoe' + product.id|string + '/600/400.jpg' }}" 
+                 class="img-fluid rounded" alt="{{ product.name }}">
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="admin-card">
+            <h1>{{ product.name }}</h1>
+            <div class="mb-3">
+                <span class="product-price">Rp. {{ "{0:,.0f}".format(product.price) }}</span>
+                <span class="product-stock ms-3">
+                    {% if product.stock > 10 %}
+                        <i class="fas fa-check-circle text-success"></i> In Stock ({{ product.stock }} available)
+                    {% elif product.stock > 0 %}
+                        <i class="fas fa-exclamation-triangle text-warning"></i> Only {{ product.stock }} left
+                    {% else %}
+                        <i class="fas fa-times-circle text-danger"></i> Out of Stock
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="mb-4">
+                <h5>Description</h5>
+                <p>{{ product.description }}</p>
+            </div>
+            
+            {% if 'user' in session and product.stock > 0 %}
+            <form method="POST" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <select class="form-select" id="quantity" name="quantity">
+                            {% for i in range(1, max_quantity) %}
+                            <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                </div>
+            </form>
+            {% elif 'user' not in session %}
+            <div class="d-grid">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-sign-in-alt"></i> Login to Add to Cart
+                </a>
+            </div>
+            {% else %}
+            <div class="d-grid">
+                <button class="btn btn-secondary btn-lg" disabled>
+                    <i class="fas fa-times-circle"></i> Out of Stock
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Related Products -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="mb-4">You May Also Like</h3>
+    </div>
+
+    {% if related_products %}
+        {% for p in related_products %}
+        <div class="col-6 col-md-3 mb-4">
+            <div class="card h-100 product-card"> {# Tambahkan class product-card untuk styling #}
+                <a href="{{ url_for('products.view_product', product_id=p.id) }}"> {# Perbaiki url_for ke products.view_product #}
+                    <img src="{{ p.image_url or 'https://picsum.photos/seed/shoe' + p.id|string + '/200/200.jpg' }}" class="card-img-top" alt="{{ p.name }}" style="object-fit: cover; height: 250px;">
+                </a>
+                <div class="card-body p-2 text-center d-flex flex-column"> {# Tambahkan d-flex flex-column #}
+                    <a href="{{ url_for('products.view_product', product_id=p.id) }}" class="text-decoration-none text-dark flex-grow-1"> {# Perbaiki url_for #}
+                        <p class="mb-1 small fw-bold">{{ p.name }}</p>
+                        <p class="mb-0 product-price small">Rp {{ "{:,.0f}".format(p.price) }}</p>
+                    </a>
+                    {# Tombol Add to Cart dihilangkan #}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center">
+            <p class="text-muted">Tidak ada produk terkait.</p>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+

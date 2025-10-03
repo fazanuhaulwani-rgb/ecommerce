@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - ShoeStore{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-credit-card"></i> Checkout
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Shipping Address Form -->
+        <div class="admin-card mb-4">
+            <h4 class="mb-3">Shipping Address</h4>
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="shipping_address" class="form-label">Delivery Address</label>
+                    <textarea class="form-control" id="shipping_address" name="shipping_address" rows="4" required 
+                              placeholder="Enter your complete shipping address">{{ user.address }}</textarea>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-check"></i> Place Order
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Order Summary -->
+        <div class="admin-card">
+            <h4 class="mb-3">Order Summary</h4>
+            
+            {% set cart_total = 0 %}
+            {% for item in session.cart %}
+                {% set product = namespace() %}
+                {% for prod in products %}
+                    {% if prod.id == item.product_id %}
+                        {% set product.id = prod.id %}
+                        {% set product.name = prod.name %}
+                        {% set product.price = prod.price %}
+                        {% set item_total = product.price * item.quantity %}
+                        {% set cart_total = cart_total + item_total %}
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{{ product.name }} ({{ item.quantity }})</span>
+                            <span>Rp. {{ "{0:,.0f}".format(item_total) }}</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            
+            <hr>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal:</span>
+                <span>Rp. {{ "{0:,.0f}".format(cart_total) }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Shipping:</span>
+                <span>Free</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <strong>Total:</strong>
+                <strong class="text-primary">Rp. {{ "{0:,.0f}".format(cart_total) }}</strong>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Free shipping on all orders!
+            </div>
+            
+            <div class="text-center">
+                <a href="{{ url_for('cart.view_cart') }}" class="text-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

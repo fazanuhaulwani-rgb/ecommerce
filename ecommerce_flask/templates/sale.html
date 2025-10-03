@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Sale - 4OUR SHOES{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- Sidebar Filter -->
+    <aside class="col-md-3 mb-4">
+        <div class="card p-3">
+            <h5 class="mb-3">Filter Produk</h5>
+
+            <!-- Filter Form -->
+            <form id="filterForm">
+                
+                <!-- Filter by Brand -->
+                <div class="mb-3">
+                    <h6>Brand</h6>
+                    {% for brand in brand_list %}
+                        <div class="form-check">
+                            <input class="form-check-input filter-checkbox" type="checkbox" value="{{ brand.slug }}" name="brand" id="brand-{{ brand.slug }}">
+                            <label class="form-check-label" for="brand-{{ brand.slug }}">{{ brand.name }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Filter by Sport -->
+                <div class="mb-3">
+                    <h6>Sports</h6>
+                    {% for sport in sports_list %}
+                        <div class="form-check">
+                            <input class="form-check-input filter-checkbox" type="checkbox" value="{{ sport.slug }}" name="sport" id="sport-{{ sport.slug }}">
+                            <label class="form-check-label" for="sport-{{ sport.slug }}">{{ sport.name }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Filter by Category -->
+                <div class="mb-3">
+                    <h6>Men</h6>
+                    <div class="form-check">
+                        <input class="form-check-input filter-checkbox" type="checkbox" value="man" name="category" id="category-man">
+                        <label class="form-check-label" for="category-man">Lihat Semua</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h6>Women</h6>
+                    <div class="form-check">
+                        <input class="form-check-input filter-checkbox" type="checkbox" value="woman" name="category" id="category-woman">
+                        <label class="form-check-label" for="category-woman">Lihat Semua</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h6>Kids</h6>
+                    <div class="form-check">
+                        <input class="form-check-input filter-checkbox" type="checkbox" value="kids" name="category" id="category-kids">
+                        <label class="form-check-label" for="category-kids">Lihat Semua</label>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Products -->
+    <section class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Produk Sale</h3>
+            <!-- Sort Dropdown -->
+            <select class="form-select w-auto ms-2" id="sortProducts">
+                <option value="">Sort By</option>
+                <option value="price-asc">Harga Terendah → Tertinggi</option>
+                <option value="price-desc">Harga Tertinggi → Terendah</option>
+                <option value="newest">Terbaru</option>
+            </select>
+        </div>
+
+        <div class="row" id="productContainer">
+            {% if products %}
+                {% for product in products %}
+                    <div class="col-lg-4 col-md-6 mb-4 product-card"
+                         data-brand="{{ product.brand|lower }}"
+                         data-sport="{{ product.sport|lower }}"
+                         data-category="{{ product.category|lower }}">
+                        <div class="card h-100">
+                            <img src="{{ product.image_url or url_for('static', filename='images/placeholder.png') }}" class="card-img-top" alt="{{ product.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text">{{ product.description[:60] }}{% if product.description|length > 60 %}...{% endif %}</p>
+                                <p class="fw-bold">Rp {{ "{:,.0f}".format(product.price) }}</p>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <a href="{{ url_for('products.product_detail', product_id=product.id) }}" class="btn btn-primary btn-sm">Detail</a>
+                                <span class="badge bg-success">{{ product.stock }} in stock</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <p class="text-muted">Tidak ada produk untuk saat ini.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+</div>
+
+{% block scripts %}
+<script>
+// Live Filtering
+const filterCheckboxes = document.querySelectorAll('.filter-checkbox');
+const productContainer = document.getElementById('productContainer');
+const products = productContainer.querySelectorAll('.product-card');
+
+function applyFilters() {
+    const selectedBrands = Array.from(document.querySelectorAll('input[name="brand"]:checked')).map(i => i.value.toLowerCase());
+    const selectedSports = Array.from(document.querySelectorAll('input[name="sport"]:checked')).map(i => i.value.toLowerCase());
+    const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(i => i.value.toLowerCase());
+
+    products.forEach(p => {
+        const brand = p.dataset.brand;
+        const sport = p.dataset.sport;
+        const category = p.dataset.category;
+
+        const brandMatch = selectedBrands.length === 0 || selectedBrands.includes(brand);
+        const sportMatch = selectedSports.length === 0 || selectedSports.includes(sport);
+        const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(category);
+
+        if (brandMatch && sportMatch && categoryMatch) {
+            p.style.display = '';
+        } else {
+            p.style.display = 'none';
+        }
+    });
+}
+
+// Trigger filter on any checkbox change
+filterCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
+
+// Sorting
+document.getElementById('sortProducts').addEventListener('change', function(){
+    const cards = Array.from(productContainer.querySelectorAll('.product-card'));
+    const sortValue = this.value;
+
+    cards.sort((a,b) => {
+        const priceA = parseFloat(a.querySelector('.card-body p.fw-bold').textContent.replace(/[Rp,]/g,''));
+        const priceB = parseFloat(b.querySelector('.card-body p.fw-bold').textContent.replace(/[Rp,]/g,''));
+        if(sortValue === 'price-asc') return priceA - priceB;
+        if(sortValue === 'price-desc') return priceB - priceA;
+        return 0;
+    });
+
+    cards.forEach(c => productContainer.appendChild(c));
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}All Brands - 4OUR SHOES{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center mb-4 fw-bold">All Brands</h2>
+  <div class="row g-4 justify-content-center">
+    {% for brand in brand_list %}
+    <div class="col-6 col-md-3">
+      <a href="{{ url_for('brand_detail', slug=brand.slug) }}" class="brand-card d-block text-center p-4 rounded shadow-sm">
+        <div class="brand-logo-wrapper mb-2">
+          <img src="{{ brand.logo_url }}" alt="{{ brand.name }}" class="img-fluid brand-logo">
+        </div>
+        <span class="brand-name fw-semibold">{{ brand.name }}</span>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .brand-card {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+    text-decoration: none;
+    color: inherit;
+  }
+  .brand-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    border-color: #0d6efd;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #ffffff, #f0f8ff);
+  }
+  .brand-logo-wrapper {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .brand-logo {
+    max-height: 80px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: grayscale(20%);
+    transition: all 0.3s ease;
+  }
+  .brand-card:hover .brand-logo {
+    filter: grayscale(0%) drop-shadow(0 0 5px rgba(13,110,253,0.6));
+    transform: scale(1.05);
+  }
+  .brand-name {
+    display: block;
+    font-size: 1rem;
+    margin-top: 8px;
+    transition: color 0.3s ease;
+  }
+  .brand-card:hover .brand-name {
+    color: #0d6efd;
+  }
+</style>
+{% endblock %}

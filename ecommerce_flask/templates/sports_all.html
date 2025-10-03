@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}All Sports - 4OUR SHOES{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Shop by Sport</h2>
+    <div class="row">
+        {% for sport in sports_list %}
+        <div class="col-6 col-md-3 text-center mb-4">
+            <a href="{{ url_for('sport_detail', slug=sport.slug) }}" 
+               class="d-block p-3 rounded shadow-sm sport-card"
+               style="transition: transform 0.2s, box-shadow 0.2s;">
+                <img src="{{ sport.img_url }}" alt="{{ sport.name }}" 
+                     class="img-fluid mb-2" style="max-height:80px;">
+                <h6 class="mt-2">{{ sport.name }}</h6>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.sport-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #f9f9f9, #f1f1f1);
+}
+</style>
+{% endblock %}

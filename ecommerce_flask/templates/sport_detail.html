@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ sport.name }} - 4OUR SHOES{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-4">
+    <!-- Logo / Icon Sport -->
+    <img src="{{ sport.img_url }}" alt="{{ sport.name }}" class="img-fluid mb-3" style="max-height:150px;">
+
+    <!-- Nama Sport -->
+    <h1>{{ sport.name }}</h1>
+
+    <!-- Deskripsi Sport -->
+    <p class="mt-3" style="font-size:16px; max-width:600px; margin:auto;">
+        {% if sport.name == 'Running' %}
+            Running adalah olahraga populer yang mendukung kesehatan jantung dan stamina, dengan koleksi sepatu lari terbaik untuk kenyamanan dan performa.
+        {% elif sport.name == 'Basketball' %}
+            Basketball menuntut kelincahan dan kecepatan. Temukan sepatu basket yang dirancang untuk stabilitas, grip, dan gaya di lapangan.
+        {% elif sport.name == 'Football' %}
+            Football adalah olahraga penuh semangat. Dapatkan sepatu sepak bola dengan teknologi terbaru untuk kontrol dan kecepatan.
+        {% elif sport.name == 'Training' %}
+            Training mencakup berbagai aktivitas fitness. Koleksi training shoes kami dirancang untuk fleksibilitas dan kenyamanan.
+        {% elif sport.name == 'Tennis' %}
+            Tennis adalah olahraga yang membutuhkan presisi dan ketahanan. Sepatu tenis kami memberi dukungan optimal untuk kontrol dan kenyamanan gerakan.
+        {% elif sport.name == 'Outdoor' %}
+            Outdoor menuntut daya tahan dan perlindungan ekstra. Sepatu outdoor kami siap menemani petualangan di berbagai medan berat.
+        {% else %}
+            Selamat datang di koleksi {{ sport.name }} kami!
+        {% endif %}
+    </p>
+
+    <!-- Daftar Produk -->
+    <div class="row mt-5">
+        {% set found = false %}
+        {% for product in products %}
+            {% if sport.slug|lower in product.name|lower or sport.slug|lower in product.description|lower or product.sport|lower == sport.slug|lower %}
+                {% set found = true %}
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ product.img_url }}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text" style="font-size:14px;">{{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}
+                            <p class="fw-bold">Rp {{ "{:,.0f}".format(product.price) }}</p>
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-outline-primary btn-sm">Detail</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        {% if products|length == 0 %}
+        <div class="col-12">
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle"></i> Belum ada produk untuk kategori {{ sport.name }}.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Tombol kembali ke daftar sports -->
+    <a href="{{ url_for('sports_all') }}" class="btn btn-primary mt-4">
+        &larr; Kembali ke Semua Sports
+    </a>
+</div>
+{% endblock %}

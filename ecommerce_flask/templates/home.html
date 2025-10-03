@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Home - 4Shoes{% endblock %}
+
+{% block content %}
+<!-- Fullscreen Wrapper -->
+<div class="container-fluid p-0">
+
+  <!-- Carousel Section -->
+  <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+
+      <!-- Slide 1 (Video) -->
+      <div class="carousel-item active">
+        <video class="w-100 vh-100 object-fit-cover" autoplay muted loop playsinline>
+          <source src="https://www.pexels.com/download/video/8120379/" type="video/mp4">
+          Browser Anda tidak mendukung video.
+        </video>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="carousel-item">
+        <img src="https://images.pexels.com/photos/6153374/pexels-photo-6153374.jpeg"
+             class="d-block w-100 vh-100 object-fit-cover" alt="Sepatu">
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="carousel-item">
+        <img src="https://images.pexels.com/photos/15298949/pexels-photo-15298949.jpeg"
+             class="d-block w-100 vh-100 object-fit-cover" alt="Sepatu Outdoor">
+      </div>
+    </div>
+
+    <!-- 🔹 Global Buttons Overlay -->
+    <div class="carousel-caption d-flex justify-content-start align-items-center h-100 text-start">
+    <div class="d-flex gap-3">
+        <a href="#" class="btn btn-light btn-lg">SHOP NOW</a>
+        {% if 'user' not in session %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Get Started</a>
+        {% endif %}
+    </div>
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</div>
+
+  {% if session.get('preferred_size') %}
+  <div class="alert alert-info text-center mb-0">
+      <i class="fas fa-ruler"></i> Size favorit kamu: <strong>{{ session['preferred_size'] }}</strong>
+  </div>
+  {% endif %}
+
+  <!-- Products Section -->
+  <div class="container my-5">
+      <div class="row">
+          <div class="col-12">
+              <h2 class="text-center mb-4">Featured Products</h2>
+          </div>
+          
+          {% for product in products %}
+          <div class="col-md-4 col-sm-6 mb-4 fade-in">
+              <div class="card product-card h-100">
+                  <img src="{{ product.image_url or 'https://picsum.photos/seed/shoe' + product.id|string + '/400/400.jpg' }}" 
+                       class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 300px;">
+                  <div class="card-body d-flex flex-column">
+                      <h5 class="card-title">{{ product.name }}</h5>
+                      <p class="card-text text-muted">{{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}</p>
+                      <div class="mt-auto">
+                          <div class="d-flex justify-content-between align-items-center mb-3">
+                              <span class="product-price">Rp. {{ "{:,.0f}".format(product.price) }}</span>
+                              <span class="product-stock">
+                                  {% if product.stock > 10 %}
+                                      <i class="fas fa-check-circle text-success"></i> In Stock
+                                  {% elif product.stock > 0 %}
+                                      <i class="fas fa-exclamation-triangle text-warning"></i> Only {{ product.stock }} left
+                                  {% else %}
+                                      <i class="fas fa-times-circle text-danger"></i> Out of Stock
+                                  {% endif %}
+                              </span>
+                          </div>
+                          <div class="d-flex gap-2">
+                              <a href="{{ url_for('products.view_product', product_id=product.id) }}" class="btn btn-outline-primary flex-fill">
+                                  <i class="fas fa-eye"></i> View
+                              </a>
+                              {% if 'user' in session and product.stock > 0 %}
+                                  <form action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" method="POST" class="flex-fill">
+                                      <input type="hidden" name="quantity" value="1">
+                                      <button type="submit" class="btn btn-primary w-100">
+                                          <i class="fas fa-cart-plus"></i> Add to Cart
+                                      </button>
+                                  </form>
+                              {% elif 'user' not in session %} 
+                                  <a href="{{ url_for('auth.login') }}" class="btn btn-primary flex-fill">
+                                      <i class="fas fa-cart-plus"></i> Add to Cart
+                                  </a>
+                              {% else %}
+                                  <button class="btn btn-secondary flex-fill" disabled>
+                                      <i class="fas fa-cart-plus"></i> Out of Stock
+                                  </button>
+                              {% endif %}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
+          
+          {% if not products %}
+          <div class="col-12 text-center">
+              <div class="alert alert-info">
+                  <i class="fas fa-info-circle"></i> No products available at the moment.
+              </div>
+          </div>
+          {% endif %}
+      </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="container my-5">
+      <div class="row">
+          <div class="col-md-4 text-center">
+              <div class="admin-card">
+                  <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
+                  <h4>Free Shipping</h4>
+                  <p>Free shipping on orders over Rp 500,000</p>
+              </div>
+          </div>
+          <div class="col-md-4 text-center">
+              <div class="admin-card">
+                  <i class="fas fa-undo fa-3x text-primary mb-3"></i>
+                  <h4>Easy Returns</h4>
+                  <p>30-day return policy</p>
+              </div>
+          </div>
+          <div class="col-md-4 text-center">
+              <div class="admin-card">
+                  <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                  <h4>Secure Payment</h4>
+                  <p>100% secure payment processing</p>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .carousel-item img, 
+  .carousel-item video {
+    object-fit: cover;
+  }
+</style>
+{% endblock %}

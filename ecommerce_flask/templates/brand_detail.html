@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}{{ brand.name }} - 4OUR SHOES{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row">
+    <!-- Sidebar Brand -->
+    <div class="col-md-3 mb-4">
+      <div class="list-group">
+        <h5 class="mb-3">Brands</h5>
+        {% for b in brand_list %}
+        <a href="{{ url_for('brand_detail', slug=b.slug) }}"
+           class="list-group-item list-group-item-action {% if brand.slug == b.slug %}active{% endif %}">
+          <img src="{{ b.logo_url }}" alt="{{ b.name }}" style="height: 20px; margin-right: 8px;">
+          {{ b.name }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Brand Detail Content -->
+    <div class="col-md-9 text-center">
+      <!-- Logo Brand -->
+      <img src="{{ brand.logo_url }}" alt="{{ brand.name }}" class="img-fluid mb-3" style="max-height:150px;">
+
+      <!-- Nama Brand -->
+      <h1>{{ brand.name }}</h1>
+
+      <!-- Deskripsi Brand -->
+      <p class="mt-3" style="font-size:16px; max-width:600px; margin:auto;">
+        {% if brand.name == 'Nike' %}
+            Nike adalah merek olahraga terkenal dunia yang menghadirkan sepatu, pakaian, dan aksesori inovatif untuk olahraga dan gaya hidup.
+        {% elif brand.name == 'Adidas' %}
+            Adidas menawarkan sepatu, pakaian, dan perlengkapan olahraga berkualitas tinggi dengan desain modern dan teknologi terkini.
+        {% elif brand.name == 'Puma' %}
+            Puma adalah merek global yang menghadirkan sepatu dan pakaian olahraga dengan gaya trendi dan performa tinggi.
+        {% elif brand.name == 'Reebok' %}
+            Reebok menghadirkan sepatu dan perlengkapan olahraga dengan inovasi teknologi dan kenyamanan maksimal.
+        {% else %}
+            Selamat datang di halaman {{ brand.name }}!
+        {% endif %}
+      </p>
+
+      <!-- Tombol kembali ke daftar brand -->
+      <a href="{{ url_for('brands_all') }}" class="btn btn-primary mt-4">
+          &larr; Kembali ke Semua Brand
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

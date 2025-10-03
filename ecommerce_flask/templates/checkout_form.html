@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Alamat Pengiriman - Checkout{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-map-marker-alt"></i> Alamat Pengiriman
+        </h2>
+        <p class="text-muted">Lengkapi informasi pengiriman untuk melanjutkan ke pembayaran.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="admin-card mb-4">
+            <h4 class="mb-3">
+                <i class="fas fa-truck"></i> Informasi Pengiriman
+            </h4>
+            
+            <form method="POST" action="{{ url_for('cart.checkout_form') }}">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="first_name" class="form-label">Nama Depan *</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="last_name" class="form-label">Nama Belakang *</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="mobile_phone" class="form-label">Nomor Ponsel *</label>
+                    <input type="tel" class="form-control" id="mobile_phone" name="mobile_phone" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="address" class="form-label">Alamat Lengkap *</label>
+                    <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="city" class="form-label">Kota/Kabupaten *</label>
+                        <input type="text" class="form-control" id="city" name="city" required>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="province" class="form-label">Provinsi *</label>
+                        <select class="form-select" id="province" name="province" required>
+                            <option value="">Pilih Provinsi</option>
+                            <option value="aceh">Aceh</option>
+                            <option value="sumut">Sumatera Utara</option>
+                            <option value="sumbar">Sumatera Barat</option>
+                            <option value="riau">Riau</option>
+                            <option value="jambi">Jambi</option>
+                            <option value="sumsel">Sumatera Selatan</option>
+                            <option value="bengkulu">Bengkulu</option>
+                            <option value="lampung">Lampung</option>
+                            <option value="babel">Kepulauan Bangka Belitung</option>
+                            <option value="kepri">Kepulauan Riau</option>
+                            <option value="dki">DKI Jakarta</option>
+                            <option value="jabar">Jawa Barat</option>
+                            <option value="jateng">Jawa Tengah</option>
+                            <option value="diy">DI Yogyakarta</option>
+                            <option value="jatim">Jawa Timur</option>
+                            <option value="banten">Banten</option>
+                            <option value="bali">Bali</option>
+                            <option value="ntb">Nusa Tenggara Barat</option>
+                            <option value="ntt">Nusa Tenggara Timur</option>
+                            <option value="kalbar">Kalimantan Barat</option>
+                            <option value="kalteng">Kalimantan Tengah</option>
+                            <option value="kalsel">Kalimantan Selatan</option>
+                            <option value="kaltim">Kalimantan Timur</option>
+                            <option value="kalut">Kalimantan Utara</option>
+                            <option value="sulbar">Sulawesi Barat</option>
+                            <option value="sulsel">Sulawesi Selatan</option>
+                            <option value="sulteng">Sulawesi Tengah</option>
+                            <option value="sultenggara">Sulawesi Tenggara</option>
+                            <option value="sulut">Sulawesi Utara</option>
+                            <option value="gorontalo">Gorontalo</option>
+                            <option value="maluku">Maluku</option>
+                            <option value="malut">Maluku Utara</option>
+                            <option value="papua">Papua</option>
+                            <option value="papuabarat">Papua Barat</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="zip_code" class="form-label">Kode Pos *</label>
+                    <input type="text" class="form-control" id="zip_code" name="zip_code" required>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-arrow-right"></i> Lanjutkan ke Pembayaran
+                    </button>
+                    <a href="{{ url_for('cart.view_cart') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Keranjang
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="admin-card sticky-top" style="top: 20px;">
+            <h4 class="mb-3">
+                <i class="fas fa-shopping-cart"></i> Ringkasan Pesanan
+            </h4>
+            
+            {% if cart_items %}
+                {% for item in cart_items %}
+                    <div class="d-flex align-items-center mb-2 border-bottom pb-2">
+                        <img src="{{ item.image_url or 'https://picsum.photos/seed/shoe' + item.id|string + '/50/50.jpg' }}" 
+                             class="img-fluid rounded me-2" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ item.name }}">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ item.name }}</h6>
+                            <small class="text-muted">Jml: {{ item.quantity }} x Rp. {{ "{0:,.0f}".format(item.price) }}</small>
+                        </div>
+                        <div class="fw-bold text-end">
+                            Rp. {{ "{0:,.0f}".format(item.total_price) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Tidak ada item dalam keranjang
+                </div>
+            {% endif %}
+            
+            <hr>
+            
+            <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal ({{ total_quantity }} item):</span>
+                <span class="fw-bold">Rp. {{ "{0:,.0f}".format(subtotal) }}</span>
+            </div>
+            
+            {% if discount > 0 %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Diskon:</span>
+                    <span class="text-danger">-Rp. {{ "{0:,.0f}".format(discount) }}</span>
+                </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between mb-2">
+                <span>Biaya Kirim:</span>
+                {% if shipping_cost == 0 %}
+                    <span class="text-success">Gratis</span>
+                {% else %}
+                    <span>Rp. {{ "{0:,.0f}".format(shipping_cost) }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-between mb-3">
+                <strong>Total Perkiraan:</strong>
+                <strong class="text-primary">Rp. {{ "{0:,.0f}".format(total) }}</strong>
+            </div>
+            
+            <div class="alert alert-info small">
+                <i class="fas fa-info-circle"></i> Biaya Kirim {{ 'Gratis' if shipping_cost == 0 else 'Rp. ' ~ "{0:,.0f}".format(shipping_cost) }}.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
